@@ -51,7 +51,7 @@ module.exports.datastores = {
     // adapter: 'sails-mysql',
     // url: 'mysql://user:password@host:port/database',
     adapter: 'sails-mongo',
-    host: 'localhost',
+    host: 'mongodb.abirsaid.svc',
     port: 27017,
     //user: 'username', //optional
     //password: 'password', //optional
