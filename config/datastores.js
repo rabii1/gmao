@@ -51,10 +51,10 @@ module.exports.datastores = {
     // adapter: 'sails-mysql',
     // url: 'mysql://user:password@host:port/database',
     adapter: 'sails-mongo',
-    host: 'mongodb.sirin.svc',
+    host: 'mongodb-sirin.sirin.svc',
     port: 27017,
-    //user: 'username', //optional
-    //password: 'password', //optional
+    user: 'user', //optional
+    password: 'user', //optional
     database: 'GMAO' //optional
   },
 
