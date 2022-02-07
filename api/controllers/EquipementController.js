@@ -39,7 +39,7 @@ module.exports = {
           if(!files.length) {
             return res.serverError(new Error('No file Uploaded'))
           }
-          fs.copyFile('assets/images/'+NameFile, '.tmp/public/images/'+NameFile, function(err,stat) {
+          fs.copyFile('assets/images/'+fileName, '.tmp/public/images/'+fileName, function(err,stat) {
             if (err) throw err;
             console.log('staaaaaaaaat');     
             console.log(stat);     
