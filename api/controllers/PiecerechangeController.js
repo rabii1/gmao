@@ -4,7 +4,7 @@
  * @description :: Server-side actions for handling incoming requests.
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
-
+ const fs = require('fs');
 
 module.exports = {
   
@@ -40,12 +40,18 @@ module.exports = {
                 return res.serverError(new Error('No file Uploaded'))
               }
     
-              res.send( {
-                success: true,
-                status: 200,
-                fileName:fileName,
-                message: 'Successfully created 1 row in database'
-            });
+              fs.copyFile('assets/images/'+fileName, '.tmp/public/images/'+fileName, function(err,stat) {
+                if (err) throw err;
+                console.log('staaaaaaaaat');     
+                console.log(stat);     
+                console.log('source.txt was copied to destination.txt');
+                res.send( {
+                    success: true,
+                    status: 200,
+                    fileName:fileName,
+                    message: 'Successfully created 1 row in database'
+                });
+              })
     
             //  res.ok(files);
                  
