@@ -5,8 +5,8 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 
- const moment= require('moment') 
-
+ const moment= require('moment'); 
+ //cc hal tmchihm hata narja 5alili msg baadika k nji n9olk .. see u <3 wen mechi yehdik raby kamaltli!!
  module.exports = {
 
     createIntervention: async (req, res) => {
@@ -14,11 +14,13 @@
         let date_debut = req.body.date_debut;
         let observation= req.body.observation;
         let ordreintervention=req.body.ordreintervention;
-        let taches=req.body.taches;
+        let taches=req.body.description;
         let etat=req.body.etat;
         var equipement=req.body.equipement;
         let listTache = req.body.description;
         let demandeint=req.body.demandein;
+        var listpiece=req.body.listp
+
         console.log("**************"+ordreintervention)
         let today=new Date();
         today = today.getDate()+'/'+today.getMonth()+'/'+today.getFullYear()
@@ -26,13 +28,20 @@
 
 
             intervention = await Intervention.create(
-             {demandepieces:demandepieces,date_debut:date_debut,observation:observation,taches:taches,etat:etat,ordreintervention:ordreintervention}).fetch()
+             {demandepieces:demandepieces,date_debut:date_debut,observation:observation,etat:etat,ordreintervention:ordreintervention}).fetch()
 
             let updatedRow=Etatequipement.find({equipement:equipement}).exec( async (err,list)=> {
               
 
-                listTache.forEach( async  (element)   => {
+                taches.forEach( async  (element)   => {
                     let   tache = await Tache.create({date:element.date,description:element.tache,intervention:intervention.id})
+                });
+
+                Pieceintervention.destroy({intervention: req.body.id }).exec((error) => {
+                    listpiece.forEach( async  (element)   => {
+                 
+                        let   peiece = await Pieceintervention.create({piece:element.item_id,intervention:intervention.id})
+                                                       });
                 });
 
                 list.forEach( async  (element)   => {
@@ -62,10 +71,10 @@
                     let di = await Demandeintervention.update({id:demandeint},{status:'en cours'})
                 }
                
-         
+                console.log(intervention);
          
                 res.json({intervention :'MAJ Etat Successfully '})
-                console.log(intervention);
+              
          
          
          
@@ -113,45 +122,10 @@
 
 
 /***************************** count par date ********************/
-count:function(req ,res){
-    Intervention.find({}).populate('ordreintervention').exec(function(err, intervention){
-        console.log(Intervention)
-        console.log('ttttttttttttttttrs')
-
-        var map = {};
-     console.log(intervention)
-    intervention.forEach(function(val){
-        map[val.date_debut] = map[val.date_debut] || {};
-        map[val.date_debut][val.etat] = map[val.date_debut][val.etat] || 0;
-        map[val.date_debut][val.etat]++;
-      });
-    
-       var output = Object.keys(map).map(function(key){
-        var tmpArr = [];
-        for(var etat in map[key])
-        {
-           tmpArr.push( [ etat, map[key][etat] ] )
-        }
-        return { date : key, etat: tmpArr  };
-      })
-  
-    //   console.log(document.body.innerHTML)
-    });
-},
 
 
-// getinterventionwithetatattenddespieces: (req, res) => {
- 
-//     Intervention.find().where({etat:'en attente des pieces' }).populateAll().exec(function (err, intervention) {
-       
-//         res.json(intervention)
-//         console.log(intervention)
-//         if(err){
-//             res.send(500, {error:'Database Error'});
-//         }
-//     });
 
-// },
+
    
 getAllIntervention:function(req, res){
     console.log(req.param('idTech'))
@@ -165,14 +139,42 @@ getAllIntervention:function(req, res){
     });
 
 },
+/************History  des derineres taches ***********/
 
+getAllHistoryIntervention:function(req, res){
+    
+    Intervention.find().where({or:[{etat :['en cours','en attente des pieces']}]}).populateAll().exec(function(error,intervention){
+         console.log(intervention)
+        if(error) {
+            res.json(500, {error:error});
+         }
+        
+        for (let i = 0; i < intervention.length; i++) {
+                const el = intervention[i];
+                Technicien.findOne({id:el.ordreintervention.technicien}).exec(function(err, tech){
+                   if(err){
+                       res.send(500, {error:'Database Error'});
+                   }
+                   el.ordreintervention.technicien=tech;
+                   if(i ===intervention.length-1){
+                       res.json(intervention )
+                       console.log("intervention")
+                       console.log(intervention)
+                   }
+               });
+                
+            } 
+      
+        });
+           
+},
 /*********** get all with details **************** */
 
   
 getAllInterventionWithDetails:function(req, res){
     let listfinal=[]
+
     Ordreintervention.find({etat: ['en cours','cloturer','suspenduTech','suspenduAdmin']}).populateAll().exec(function(error, ordreintervention){
-       //.find().where({or:[{status :  'cloturer' }]})
         if(error) {
                 res.json(500, {error:error});
              }
@@ -189,7 +191,13 @@ getAllInterventionWithDetails:function(req, res){
                             if(i ===ordreintervention.length-1){
                                 res.json(listfinal ) }
                         })
+
+                       
                 });
+
+               
+       
+
              }  
              else res.json({etat:"vide"})
           
@@ -230,15 +238,6 @@ getAllInterventionByTechWithDetails:function(req, res){
             });
 },
 
-
-
-
-
-
-
-
-
-
       /*****************get all Intervention **************************/ 
     
        
@@ -257,11 +256,7 @@ getAllInterventionByTechWithDetails:function(req, res){
         });
     },
 
-        // var start = moment().subtract(24, 'hours').toDate();
-        //Intervention.find().where( {"date_debut":{">":start} },{id: req.param('id')}).exec((error, intervention) => {
-        // Ordreintervention.findOne({id:intervention.ordreintervention}).populateAll().exec((error, ordreintervention) => {
-
-
+       
 /***************** get list des intervention when etat=en cours et valider ***************/
 
  getInterventionByTechnicienFromDay: (req, res) => {
@@ -292,7 +287,7 @@ getAllInterventionByTechWithDetails:function(req, res){
 getInterventionWithDetails:(req,res) => { 
 
     if (req.method == 'GET' && req.param('id', null) != null) {
-        Intervention.findOne({id: req.param('id')}).populate('ordreintervention').populate('taches').exec((error, intervention) => {
+        Intervention.findOne({id: req.param('id')}).populateAll().exec((error, intervention) => {
             
             Technicien.findOne({id:intervention.ordreintervention.technicien}).populateAll().exec((error, technicien) => {
                 console.log("technicien")
@@ -356,77 +351,135 @@ getInterventionById: (req, res) => {
 
 updateIntervention: async(req, res) => {
   
-    let demandepieces=req.body.demandepieces;
+    //var demandepieces=req.body.demandepieces;
+    let etat=req.body.etat
+    console.log(req.body)
+     var listTache = req.body.tachesx;
+     var listDemande = req.body.listDemandePiece;
 
-    const date_debut = req.body.date_debut;
-    const etat=req.body.etat;
-    const observation=req.body.observation;
-    const taches=req.body.taches;
-    const listTache = req.body.description;
-
+    var listpiece=req.body.listp
     var equipement=req.body.equipement;
-
+     var ordreintervention=req.body.ordreintervention;
     let demandeint=req.body.demandein;
-
+    let today=new Date();
+    let idintervention=req.body.id;
+    today = today.getDate()+'/'+today.getMonth()+'/'+today.getFullYear()
     try{
-        console.log(req.body)
-        intervention = await Intervention.update({ id: req.body.id }, 
-                                      {date_debut: req.body.date_debut ,
-                                        demandepieces:req.body.demandepieces,
-                                        etat:req.body.etat,
-                                        taches:req.body.taches,
-                                        observation:req.body.observation,
-                                     }).fetch()
-       
+        console.log(req.body.id)
+        intervention = await Intervention.update({ id: idintervention }, 
+                                      {            etat:req.body.etat,
+                                                    observation:req.body.observation,
+                                     }) ;
+    
         let updatedRow=Etatequipement.find({equipement:equipement}).exec( async (err,list)=> {
-         listTache.forEach( async  (element)   => {
-         let   tache = await Tache.create({date:element.date,description:element.tache,intervention:intervention.id})
-                                        });
-      
-            list.forEach( async  (element)   => {
-                let   demandeintervention = await Etatequipement.update({id:element.id},{status:'ancien'}) });
+
+            Tache.destroy({intervention: req.body.id }).exec((error) => {
+                listTache.forEach( async  (element)   => {
+             
+                    let   tache = await Tache.create({date:element.date,description:element.taches,intervention:idintervention})
+                                                   });
+            });
+            Pieceintervention.destroy({intervention: req.body.id }).exec((error) => {
+                listpiece.forEach( async  (element)   => {
+             
+                    let   peiece = await Pieceintervention.create({piece:element.item_id,intervention:idintervention})
+                                                   });
+            });
+
+         list.forEach( async  (element)   => {
+                let   etateq = await Etatequipement.update({id:element.id},{status:'ancien'}) 
+            
+            });
         
-                     if (etat=="terminer") {
+         if(etat=="en attente des pieces") {
+
+            
+            Demandepiece.destroy({intervention: idintervention }).exec((error) => {
+                listDemande.forEach( async  (element)   => {
+                                                      
+       let   demandepiece = await Demandepiece.create({piece:element.piece,quantite:element.quantite,
+         intervention:idintervention})
+     
+     });
+         //    res.json({status:"ok"} )
+        //     console.log(intervention);
+                                                                                      
+         })  
+
+
+         }
+            
+
+            if (etat=="terminer") {
                         
-                         etatequipement = await Etatequipement.create({nometat:"en marche",dateetat:today,equipement:equipement,status:'actuelle'})
-                                 let   oi = await Ordreintervention.update({id:ordreintervention},{etat:'cloturer'})
-                                 let di = await Demandeintervention.update({id:demandeint},{status:'cloturer'})
-                        
-                                        }
-                     else if (etat=="arreter") {
-                        
-                        etatequipement = await Etatequipement.create({nometat:"en panne",dateetat:today,equipement:equipement,status:'actuelle'})  
-                            let   oi = await Ordreintervention.update({id:ordreintervention},{etat:'suspenduTech'})
-                            let di = await Demandeintervention.update({id:demandeint},{status:'reinitialiser'})
-                                            // var  demandeintervention = await Demandeintervention.update({id:req.body.id},{status: req.body.status} )
-                                       
-                                        } 
-                    else if (etat=="en cours"){
-                        etatequipement = await Etatequipement.create ({nometat:"sous maintien",dateetat:today,equipement:equipement,status:'actuelle'})
-                            let   oi = await Ordreintervention.update({id:ordreintervention},{etat:'en cours'}) 
-                            let di = await Demandeintervention.update({id:demandeint},{status:'en cours'})
-                                        }
+                etatequipement = await Etatequipement.create({nometat:"en marche",dateetat:today,equipement:equipement,status:'actuelle'})
+                        let   oi = await Ordreintervention.update({id:ordreintervention},{etat:'cloturer'})
+                        let di = await Demandeintervention.update({id:demandeint},{status:'cloturer'})
+               
+                               }
+            else if (etat=="arreter") {
+               
+               etatequipement = await Etatequipement.create({nometat:"en panne",dateetat:today,equipement:equipement,status:'actuelle'})  
+                   let   oi = await Ordreintervention.update({id:ordreintervention},{etat:'suspenduTech'})
+                   let di = await Demandeintervention.update({id:demandeint},{status:'reinitialiser'})
+                              
+                               } 
+           else if (etat=="en cours"){
+               etatequipement = await Etatequipement.create ({nometat:"sous maintien",dateetat:today,equipement:equipement,status:'actuelle'})
+                   let   oi = await Ordreintervention.update({id:ordreintervention},{etat:'en cours'}) 
+                   let di = await Demandeintervention.update({id:demandeint},{status:'en cours'})
+                               }
+
+
+
+
+            
+
                          res.json(intervention )
                          console.log(intervention);
                                  
-                                    })
+                        
+
+                        
+
+
+                        })
                                     
-                                                                    
-        // res.send({
-        //     success: true,
-        //     status: 200,
-        //     message: 'Successfully updated 1 row in database'
-        // });
-    }
-    catch(error){
-        res.send({
-            success: false,
-            status: 500,
-            message: 'Wrong data'
-        });
-    }
+        }  
+        catch(error){
+            res.json({intervention :error})
+        }
+      
+     
 },
 
+
+
+updateDemandepiece:async (req, res)=>{
+    var listdemadePiece=req.body.quantite;
+    try{
+        console.log(listdemadePiece);
+       // intervention = await Intervention.update({ id: req.body.id },{demandepieces:req.body.quantite});
+       Demandepiece.destroy({interventions: req.body.intervention }).exec((error) => {
+        listdemadePiece.forEach( async  (element)   => {
+                                              
+let   demandepiece = await Demandepiece.create({piece:element.piece,quantite:element.quantite,
+ interventions:req.body.intervention})
+
+});
+     res.json({status:"ok"} )
+//     console.log(intervention);
+                                                                              
+ }) 
+        
+     }      
+                   
+catch(error){
+ res.json({status :error})
+}
+
+
+    },
 
 
 /*******************change etat Suspendu par Admin ***********************/
@@ -558,7 +611,55 @@ CountIntervention:async (req,res)=>{
                   
 
             },
+            getlistStat:(req,res)=>{
 
+                let m=[];
+
+                Intervention.find({etat:['en cours']}).populateAll().exec(function (err, ec) {
+                  
+                    m.push(ec.length)
+                        Intervention.find({etat:['terminer']}).exec(function (err,tr){
+                            m.push(tr.length)
+
+            
+                            Intervention.find({etat:['en attente des pieces']}).exec(function (err,enp){
+                                m.push(enp.length)
+
+            
+                                Intervention.find({etat:['arreter']}).exec(function (err,arr){
+                                    m.push(arr.length)
+
+            
+                                    Intervention.find({etat:['suspenduAdmin']}).exec(function (err,sus){
+                                        m.push(sus.length)
+
+            
+                                        res.json(m)
+                    
+                    
+                                    })                
+                
+                                })            
+            
+                            })
+            
+            
+            
+                        })
+            
+            
+            
+            
+            
+            
+            
+            
+            
+        
+            
+                });
+            },
+            
 };
 
 

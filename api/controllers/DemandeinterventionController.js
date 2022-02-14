@@ -70,9 +70,27 @@ getDemandeSelonEmployeeConnected:function(req,res) {
                     if(error) {
                     res.json(500, {error:error});
                  }
-                    res.json(demandeintervention)    
-                    console.log(demandeintervention)
-                    console.log("demande")
+                 for (let i = 0; i < demandeintervention.length; i++) {
+                    const el = demandeintervention[i];
+
+
+        Equipement.findOne({id:el.equipement}).exec(function(err, equi){
+   
+           if(err){
+               res.send(500, {error:'Database Error'});
+           }
+           el.equipement=equi;
+           
+           if(i ===demandeintervention.length-1){
+               res.json(demandeintervention )
+               console.log("demandeintervention")
+
+               console.log(demandeintervention)
+           }
+       });
+        
+    }
+       
 
                 });
                
@@ -87,9 +105,28 @@ getDemandeNontraiteSelonEmployeeConnected:function(req,res) {
                          if(error) {
                          res.json(500, {error:error});
                       }
-                         res.json(demandeintervention)    
-                         console.log(demandeintervention)
-                         console.log("demande")
+
+                       for (let i = 0; i < demandeintervention.length; i++) {
+                            const el = demandeintervention[i];
+
+
+                Equipement.findOne({id:el.equipement}).exec(function(err, equi){
+           
+                   if(err){
+                       res.send(500, {error:'Database Error'});
+                   }
+                   el.equipement=equi;
+                   
+                   if(i ===demandeintervention.length-1){
+                       res.json(demandeintervention )
+                       console.log("demandeintervention")
+       
+                       console.log(demandeintervention)
+                   }
+               });
+                
+            }
+                       
      
                      });
                     
@@ -289,11 +326,7 @@ getDemandeNontraiteSelonEmployeeConnected:function(req,res) {
                 }
              res.json({demandeintervention :demandeintervention})
 
-             /*    res.send({
-                    success: true,
-                    status: 200,
-                    message: 'Successfully created 1 row in database'
-                }); */
+           
                 console.log(demandeintervention)
     
             });

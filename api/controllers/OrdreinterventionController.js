@@ -185,19 +185,17 @@ getOrdreSelonUserConnected:function(req,res) {
         /*******************change etat Rejetee ***********************/
  Updatestatus: async(req, res) => {
             const etat='initiale';
-          console.log( req.body.etat )
+          console.log( req.body )
           let today=new Date();
 
           today = today.getDate()+'/'+today.getMonth()+'/'+today.getFullYear()
                
-              var  ordreintervention = await Ordreintervention.update({id: req.body.id }, 
-                                                                      {etat: req.body.etat, 
-                                                                       description:req.body.description,
-                                                                       date :req.body.date},)
                         if(req.body.etat=="rejetee"){
-                          let oi = await Ordreintervention.update({id:req.body.idOrdre},{etat:'rejetee'})
+                          let oi = await Ordreintervention.update({id:req.body.idOrdre},{etat:'rejetee',
+                          description:req.body.description,
+                        })
                           let demande = await Demandeintervention.update({id:req.body.id},{status:'reinitialiser'})
-                          res.json({action:"rejetee",date:today,description:req.body.description,data:ordreintervention,ordreintervention :'MAJ Etat Successfully'})
+                          res.json({action:true,status :'MAJ Etat Successfully'})
                           console.log(req.body.etat)
                           console.log(req.body.description)
                           console.log(req.body.date)
@@ -425,6 +423,136 @@ getInterventionByTechnicienFromDay: (req, res) => {
             res.json(ordreintervention)
           });
      }
-}    
-};
+},  
+
+CountOrdreExceptionBienRecu:async (req,res)=>{
+    if (req.method == 'GET' ) {
+        // id:intervention.ordreintervention.technicien
+        Ordreintervention.find().where( {etat:['bien reçu','rejetee']}).exec(function (err, ordreintervention) {
+            if(err){
+                res.json(500, {error:err});
+            }
+            res.json({totalOrdre:ordreintervention.length});
+            });
+        console.log('*************totalOrdre***************')
+    } else {
+        res.send({
+            success: false,
+            status: 500,
+            message: 'Error in request'
+        });
+        return;
+    }
+},
+getlistordreNotif:(req,res)=>{
+    Ordreintervention.find({etat:['bien reçu','rejetee']}).populateAll().exec(function (err, ordreintervention) {
+      
+
+            Intervention.find({etat:['arreter','en attente des pieces']}).exec(function (err,intervention){
+
+
+                Demandeintervention.find({status:['initiale','reinitialiser','en cours']}).exec(function (err,demandeintervention){
+
+
+                    res.json({ordre:ordreintervention.length,intervention:intervention.length,demande:demandeintervention.length})
+
+
+                })
+
+
+
+            })
+
+
+
+
+
+
+
+
+
+   /*      for (let i = 0; i < ordreintervention.length; i++) {
+            const el = ordreintervention[i];
+            Equipement.findOne({id:el.demandeintervention.equipement}).exec(function(err, equi){
+               if(err){
+                   res.send(500, {error:'Database Error'});
+               }
+               el.demandeintervention.equipement=equi;
+               if(i ===ordreintervention.length-1){
+                   res.json(ordreintervention )
+                   console.log("hhhhhhhhhhhhhh")
+                   console.log(ordreintervention)
+               }
+           });
+        } */
+
+    });
+},
+getlistStat:(req,res)=>{
+
+    let m=[];
+
+    Ordreintervention.find({etat:['en cours']}).populateAll().exec(function (err, ec) {
+      
+        m.push(ec.length)
+            Ordreintervention.find({etat:['cloturer']}).exec(function (err,tr){
+                m.push(tr.length)
+
+
+                Ordreintervention.find({etat:['suspenduAdmin']}).exec(function (err,enp){
+                    m.push(enp.length)
+
+
+                    Ordreintervention.find({etat:['suspenduTech']}).exec(function (err,arr){
+                        m.push(arr.length)
+
+
+                        Ordreintervention.find({etat:['bien reçu']}).exec(function (err,sus){
+                            m.push(sus.length)
+
+
+                            Ordreintervention.find({etat:['rejetee']}).exec(function (err,reje){
+                                m.push(reje.length)
+    
+    
+                                Ordreintervention.find({etat:['annuler']}).exec(function (err,annu){
+                                    m.push(annu.length)
+        
+        
+                                    res.json(m)
+                
+                
+                                })    
+            
+            
+                            })    
+        
+        
+                        })                
+    
+                    })            
+
+                })
+
+
+
+            })
+
+
+
+
+
+
+
+
+
+
+
+    });
+},
+}
+
+
+
+       
 

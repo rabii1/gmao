@@ -115,7 +115,6 @@ deleteService: function(req, res) {
                 status: 200,
                 message: 'Successfully deleted 1 row in database'
             });
-            return;
         });
     } else {
         res.send({
@@ -123,7 +122,6 @@ deleteService: function(req, res) {
             status: 500,
             message: 'Unable to delete'
         });
-        return;
     }
 },
 
@@ -134,22 +132,17 @@ deleteServicerWithequipementNoPermitted: function(req, res) {
 if (req.method == 'GET' && req.param('id', null) != null) {
     Equipement.find({service:req.param('id')}).exec((error, service) => {
         console.log(service);
-       
-       
          if (service.length == 0) {
 
             console.log('This service  has no associated Equipement');
-            Service.destroy({id:req.param('id')}).exec(function(service) {
-            }); 
-            res.json({action:true,data:null})
-
-            return true;   
-
+            // Service.destroy({id:req.param('id')}).exec(function(service) {
+            // }); 
+            res.json({action:"oui"})
        }
        else {
  
             console.log('This service  has  associated piece rechange');
-             res.json({action:false,data:service})
+             res.json({action:"non",data:service})
               return true;        
             
 

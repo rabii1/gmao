@@ -5,10 +5,6 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 
-
- const fs = require('fs');
-
-
 module.exports = {
     upload: async (req, res) => {
 
@@ -39,20 +35,13 @@ module.exports = {
           if(!files.length) {
             return res.serverError(new Error('No file Uploaded'))
           }
-          fs.copyFile('assets/images/'+fileName, '.tmp/public/images/'+fileName, function(err,stat) {
-            if (err) throw err;
-            console.log('staaaaaaaaat');     
-            console.log(stat);     
-            console.log('source.txt was copied to destination.txt');
-            res.send( {
-                success: true,
-                status: 200,
-                fileName:fileName,
-                message: 'Successfully created 1 row in database'
-            });
-          })
 
-        
+          res.send( {
+            success: true,
+            status: 200,
+            fileName:fileName,
+            message: 'Successfully created 1 row in database'
+        });
 
         //  res.ok(files);
              
@@ -183,7 +172,7 @@ deleteEquipement: function(req, res) {
                 status: 200,
                 message: 'Successfully deleted 1 row in database'
             });
-            return;
+            //return;
         });
     } else {
         res.send({
@@ -191,7 +180,7 @@ deleteEquipement: function(req, res) {
             status: 500,
             message: 'Unable to delete'
         });
-        return;
+        //return;
     }
 },
  getAllEquipementByService:function (req,res){
@@ -216,28 +205,14 @@ deleteEquipementWithdemandeInterventionNoPermitted: function(req, res) {
     if (req.method == 'GET' && req.param('id', null) != null) {
         Etatequipement.find({equipement:req.param('id')}).exec((error, equipement) => {
             console.log(equipement);
-           
-           
              if (equipement.length == 0) {
-    
                 console.log('This Equipement  has no associated Etatequipement');
-                Equipement.destroy({id:req.param('id')}).exec(function(equipement) {
-                });
-                    //res.json({action:"deleted"})
-    
-              
-                res.json({action:true,data:null})
-
-               
-    
+                res.json({action:oui})
            }
            else {
-     
                 console.log('This Equipement  has  associated with Etatequipement');
                  res.json({action:"non",data:equipement})
                   return true;        
-                
-    
             }  
         } )
      }

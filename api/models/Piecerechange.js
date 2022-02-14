@@ -44,7 +44,7 @@ module.exports = {
     collection: 'equipement',
     via: 'piecerechanges',
 },
-
+ 
   },
   datastores:'sails-mongo',
 

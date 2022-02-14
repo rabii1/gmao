@@ -36,7 +36,7 @@ module.exports = {
      },
      demandepieces: {
       collection: 'demandepiece',
-      via: 'interventions'
+      via: 'intervention'
     },
     pieceinterventions: {
       collection: 'pieceintervention',

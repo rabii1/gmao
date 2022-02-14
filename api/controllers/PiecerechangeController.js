@@ -5,7 +5,7 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 
- const fs = require('fs');
+
 module.exports = {
   
 
@@ -40,18 +40,12 @@ module.exports = {
                 return res.serverError(new Error('No file Uploaded'))
               }
     
-              fs.copyFile('assets/images/'+fileName, '.tmp/public/images/'+fileName, function(err,stat) {
-                if (err) throw err;
-                console.log('staaaaaaaaat');     
-                console.log(stat);     
-                console.log('source.txt was copied to destination.txt');
-                res.send( {
-                    success: true,
-                    status: 200,
-                    fileName:fileName,
-                    message: 'Successfully created 1 row in database'
-                });
-              })
+              res.send( {
+                success: true,
+                status: 200,
+                fileName:fileName,
+                message: 'Successfully created 1 row in database'
+            });
     
             //  res.ok(files);
                  
@@ -209,7 +203,7 @@ deletePiecerechange: function(req, res) {
                 status: 200,
                 message: 'Successfully deleted 1 row in database'
             });
-            return;
+            //return;
         });
     } else {
         res.send({
@@ -217,7 +211,7 @@ deletePiecerechange: function(req, res) {
             status: 500,
             message: 'Unable to delete'
         });
-        return;
+        //return;
     }
 },
 deletePiecerechangeWithFournisseurNoPermitted: function(req, res) {
@@ -230,12 +224,12 @@ if (req.method == 'GET' && req.param('id', null) != null) {
          if (piecerechange.length == 0) {
 
             console.log('This piece rechange  has no associated Fournisseur');
-            Piecerechange.destroy({id:req.param('id')}).exec(function(piecerechange) {
+            //Piecerechange.destroy({id:req.param('id')}).exec(function(piecerechange) {
 
-                res.json({action:"deleted"})
+                res.json({action:"oui"})
 
-            });
-            return true;   
+            //});
+            //return true;   
 
        }
        else {

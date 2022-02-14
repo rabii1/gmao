@@ -140,16 +140,14 @@ deleteTechnicien: function(req, res) {
                 status: 200,
                 message: 'Successfully deleted 1 row in database'
             });
-            return;
-        });
+         });
     } else {
         res.send({
             success: false,
             status: 500,
             message: 'Unable to delete'
         });
-        return;
-    }
+     }
 },
 
 
@@ -165,18 +163,19 @@ deleteTechnicienWithOrdreNoPermitted: function(req, res) {
              if (technicien.length == 0) {
     
                 console.log('This Ordre intervention  has no associated technicien');
-                Technicien.destroy({id:req.param('id')}).exec(function(technicien) {
+                res.json({action:"oui"})
+                /*   Technicien.destroy({id:req.param('id')}).exec(function(technicien) {
     
-                    res.json({action:"deleted"})
+                  
     
-                });
-                return true;   
+                });*/
+              //  return true;   
            }
            else {
      
                 console.log('This technicien  has  associated Ordre intervention');
                  res.json({action:"non",data:technicien})
-                  return true;        
+              //    return true;        
                 
     
             }  

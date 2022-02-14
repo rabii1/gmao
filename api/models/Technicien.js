@@ -32,7 +32,7 @@ module.exports = {
     },
     grade: {
       type: 'string',
-      required: true
+      //required: true
     },
     tel: {
       type: 'string',

@@ -124,7 +124,7 @@ module.exports = {
                     status: 200,
                     message: 'Successfully deleted 1 row in database'
                 });
-                return;
+               
             });
         } else {
             res.send({
@@ -132,7 +132,7 @@ module.exports = {
                 status: 500,
                 message: 'Unable to delete'
             });
-            return;
+           
         }
     },
    
@@ -146,12 +146,12 @@ module.exports = {
                  if (employee.length == 0) {
         
                     console.log('This employee  has no associated demande intervention');
-                    Employee.destroy({id:req.param('id')}).exec(function(employee) {
+                    //Employee.destroy({id:req.param('id')}).exec(function(employee) {
         
-                        res.json({action:"deleted"})
+                        res.json({action:"oui"})
         
-                    });
-                    return true;   
+                    //});
+                    //return true;   
         
                }
                else {
@@ -166,5 +166,8 @@ module.exports = {
          }
                
         },     
+
+
+
 };
 

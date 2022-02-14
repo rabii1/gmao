@@ -21,7 +21,7 @@ attributes: {
         //required: true
       },
       
-      interventions:{
+      intervention:{
        model:'intervention',
      } 
 },

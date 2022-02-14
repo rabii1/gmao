@@ -11,7 +11,7 @@ module.exports = {
 
 
     piece: {
-      type: 'string',
+      model:'piecerechange',
       //required: true
     },
   

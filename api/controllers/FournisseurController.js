@@ -139,27 +139,17 @@ deleteFournisseur: function(req, res) {
  deleteFournisseurWithPiecesNoPermitted: function(req, res) {
     console.log(req.param('id'))
 if (req.method == 'GET' && req.param('id', null) != null) {
-    Piecerechange.find({fournisseur:req.param('id')}).exec((error, fournisseur) => {
-        console.log(fournisseur);
-       
-       
+ Piecerechange.find({fournisseur:req.param('id')}).exec((error, fournisseur) => {
+
          if (fournisseur.length == 0) {
 
             console.log('This fournisseur  has no associated piece rechange');
-             Fournisseur.destroy({id:req.param('id')}).exec(function(fournisseur) {
-            }); 
-            res.json({action:true,data:null})
-
-            return true;   
-
+            res.json({action:"oui"})
        }
        else {
- 
             console.log('This fournisseur  has  associated piece rechange');
-             res.json({action:false,data:fournisseur})
+             res.json({action:"non",data:fournisseur})
               return true;        
-            
-
         }  
     } )
  }

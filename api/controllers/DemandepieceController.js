@@ -83,7 +83,7 @@ updatedemandepiece: async(req, res) => {
 
     const piece = req.body.piece;
     const quantite=req.body.quantite;
-const interventions =req.body.interventions;
+    const interventions =req.body.interventions;
 
 try{
     console.log(req.body)
@@ -132,13 +132,13 @@ if (req.method == 'GET' && req.param('id', null) != null) {
 
 getDemandeGroupbyIn:  (req, res) => {
     
-  
+  console.log('starting ************************* \n')
 
 // Send it to the database.
 
 const aggregateArray = [
   {$group:  {
-        _id: "$interventions",
+        _id: "$intervention",
         list: {
     $push: {piece: "$piece", quantite: "$quantite" }
   }
@@ -149,17 +149,21 @@ var db = Demandepiece.getDatastore().manager;
 
 var rawMongoCollection = db.collection("demandepiece").aggregate(aggregateArray)
 .toArray((err, results) => {
-   console.error(err)
+ if(err)  console.error(err)
     
    async.each(results,function(el,callback) {
 
 
     const id= el._id
+    console.log('******* ordre intervention ********** \n')
+    console.log(el)
     Intervention.findOne({id:id.toString()}).populate('taches').
     populate('ordreintervention').exec((err,resq)=> {
 
-     console.log(err)
-     Technicien.findOne({id:resq.ordreintervention.technicien}).exec((err,technicien)=> {
+    if(err)   console.log(err)
+     console.log('******* ordre intervention ********** \n')
+        console.log(resq)
+      Technicien.findOne({id:resq.ordreintervention.technicien}).exec((err,technicien)=> {
         resq.ordreintervention.technicien=technicien;
         el.intervention=resq;
 
